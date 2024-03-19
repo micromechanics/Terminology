@@ -11,7 +11,7 @@ Terminology Lookup Tool
 * Install the requirements
   * `pip install -r requirements.txt`
 * Run the tool
-  * `venv/bin/python terminology_lookup_dialog.py`
+  * `python terminology_lookup_dialog.py`
 
 ## Current Problems
 ### LOV
