@@ -1,5 +1,17 @@
 # Terminology
-Terminology Lookup Tool 
+Terminology Lookup Tool
+
+# Usage
+* Navigate to the project directory
+  * `cd <project-directory-path>`
+* Create a virtual python environment
+  * `python3 -m venv venv`
+* Activate the virtual environment
+  * `source venv/bin/activate`
+* Install the requirements
+  * `pip install -r requirements.txt`
+* Run the tool
+  * `python terminology_lookup_dialog.py`
 
 ## Current Problems
 ### LOV

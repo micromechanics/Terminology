@@ -19,8 +19,8 @@ from PySide6 import QtCore, QtWidgets
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QCheckBox, QHBoxLayout, QLabel, QMessageBox, QWidget
 
-from pasta_eln.GUI.ontology_configuration.terminology_lookup_dialog_base import Ui_TerminologyLookupDialogBase
-from pasta_eln.GUI.ontology_configuration.terminology_lookup_service import TerminologyLookupService
+from terminology_lookup_dialog_base import Ui_TerminologyLookupDialogBase
+from terminology_lookup_service import TerminologyLookupService
 
 
 class TerminologyLookupDialog(Ui_TerminologyLookupDialogBase):
@@ -47,7 +47,7 @@ class TerminologyLookupDialog(Ui_TerminologyLookupDialogBase):
 
     # Load the icon images for lookup portals
     current_path = realpath(join(getcwd(), dirname(__file__)))
-    resources_path = join(current_path, "../../Resources/Icons")
+    resources_path = join(current_path, "Resources/Icons")
     self.icons_pixmap = {
       "wikipedia": QPixmap(join(resources_path, "wikipedia.png")).scaledToWidth(50),
       "wikidata": QPixmap(join(resources_path, "wikidata.png")).scaledToWidth(50),
@@ -146,17 +146,16 @@ class TerminologyLookupDialog(Ui_TerminologyLookupDialogBase):
     self.logger.info("Terminology search initiated for term: %s..", search_term)
     self.searchProgressBar.setValue(5)
     event_loop = get_event_loop()
-    lookup_results = event_loop.run_until_complete(
-      self.terminology_lookup_service.do_lookup(search_term))
-    if lookup_results:
+    if lookup_results := event_loop.run_until_complete(
+        self.terminology_lookup_service.do_lookup(search_term)):
       for service in lookup_results:
         for result in service['results']:
           self.add_scroll_area_entry(self.icons_pixmap[service['name']],
                                      textwrap.fill(result['information'], width=100, max_lines=2),
                                      result['iri'])
           self.searchProgressBar.setValue((100 - self.searchProgressBar.value()) / 2)
-    if self.terminology_lookup_service.session_request_errors:
-      self.errorConsoleTextEdit.setText('\n'.join(self.terminology_lookup_service.session_request_errors))
+    if self.terminology_lookup_service.http_client.session_request_errors:
+      self.errorConsoleTextEdit.setText('\n'.join(self.terminology_lookup_service.http_client.session_request_errors))
       self.errorConsoleTextEdit.setVisible(True)
     self.searchProgressBar.setValue(100)
 
@@ -172,3 +171,12 @@ class TerminologyLookupDialog(Ui_TerminologyLookupDialogBase):
     self.errorConsoleTextEdit.clear()
     self.errorConsoleTextEdit.setVisible(False)
     self.selected_iris.clear()
+
+
+if __name__ == "__main__":
+  import sys
+
+  app = QtWidgets.QApplication(sys.argv)
+  ui = TerminologyLookupDialog()
+  ui.instance.show()
+  sys.exit(app.exec())
